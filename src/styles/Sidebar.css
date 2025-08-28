@@ -1,0 +1,153 @@
+/* ===== Reset ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, #root { height: 100%; width: 100%; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1f5f9;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 1000;
+  padding: 0;
+  box-shadow: 0 0 15px rgba(0,0,0,0.08);
+  transition: transform .25s ease;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.sidebar-header h2 i { margin-right: 10px; color: #60a5fa; }
+
+.sidebar ul {
+  list-style: none;
+  padding: 20px 15px;
+  flex: 1 1 auto;
+}
+.sidebar ul li { margin: 8px 0; }
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #cbd5e1;
+  display: flex; align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+  font-weight: 500;
+}
+.sidebar ul li a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.sidebar ul li a.active {
+  background: #3b82f6; color: #fff;
+  box-shadow: 0 6px 12px rgba(59,130,246,0.25);
+}
+.sidebar ul li a i { width: 20px; text-align: center; }
+
+/* Footer */
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.user-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #3b82f6; color:#fff; font-weight: 700;
+  display:flex; align-items:center; justify-content:center;
+}
+.logout-btn {
+  display:block; width:100%; text-align:center;
+  padding: 12px; border-radius: 8px; color:#fff; text-decoration: none;
+  background: rgba(255,255,255,0.1);
+  transition: background .2s ease;
+}
+.logout-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+.main-content {
+  margin-left: 280px;                /* espacio del sidebar */
+  min-height: 100vh;
+  background: #f1f5f9;
+  display: flex; flex-direction: column;
+}
+.main-content.no-margin { margin-left: 0; } /* para móviles cuando ocultas sidebar */
+
+/* Topbar */
+.topbar {
+  background: #fff;
+  padding: 15px 25px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  position: sticky; top: 0; z-index: 900;
+}
+.menu-toggle {
+  display: none;
+  background: none; border: none;
+  font-size: 1.5rem; color: #64748b; cursor: pointer;
+}
+
+/* Buscador (clases EXACTAS a tu HTML) */
+.search-box {
+  display: flex; align-items: center;
+  background: #eef2f7;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  width: 300px; max-width: 60vw;
+}
+.search-box i { color: #64748b; margin-right: 8px; }
+.search-box input {
+  border: none; background: transparent; outline: none;
+  flex: 1; padding: 4px 0; color: #334155;
+}
+
+/* Menú de usuario y campana */
+.user-menu { display: flex; align-items: center; gap: 16px; }
+.notification-bell { position: relative; color: #64748b; cursor: pointer; }
+.badge {
+  position: absolute; top: -6px; right: -6px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #ef4444; color: #fff; font-size: 0.7rem;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* Área de contenido */
+.content-area {
+  flex: 1 1 auto;
+  padding: 25px;
+  overflow-y: auto;                 /* scroll solo si hace falta */
+  color: #0f172a;                   /* evita textos blancos */
+}
+.content-area h1 {
+  font-size: 2rem; font-weight: 800; margin-bottom: 6px; color: #0f172a;
+}
+.content-area p {
+  font-size: .95rem; color: #64748b; margin-bottom: 16px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.active { transform: translateX(0); }
+  .menu-toggle { display: inline-flex; }
+  .main-content { margin-left: 0; }
+  .search-box { width: 200px; }
+}
+@media (max-width: 576px) {
+  .search-box { display: none; }
+}
