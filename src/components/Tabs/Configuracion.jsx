@@ -9,7 +9,7 @@ const Configuracion = () => {
 
   return (
     <div className="tab-content">
-      <h2>Configuración del Sistema</h2>
+      <h2>Configuración del Sistema Nitricion - ISTAP</h2>
 
       <div className="control-section">
         <div className="control-grid">
