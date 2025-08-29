@@ -13,16 +13,16 @@ const Configuracion = () => {
 
       <div className="control-section">
         <div className="control-grid">
-          
-          {/* Grupo de actualización */}
+
+          {/* Configuración de Sensores */}
           <div className="control-group">
             <div className="control-title">
-              <span>🔧</span>
-              Configuración de Actualización
+              <span>🌿</span> Parámetros de Sensores ESP32
             </div>
+
             <div className="form-group">
               <label className="form-label">
-                Intervalo de actualización (segundos):
+                Intervalo de actualización de datos (segundos):
               </label>
               <input
                 type="number"
@@ -38,18 +38,29 @@ const Configuracion = () => {
             </button>
           </div>
 
-          {/* Grupo de datos */}
+          {/* Control de Datos */}
           <div className="control-group">
             <div className="control-title">
-              <span>📊</span>
-              Configuración de Datos
+              <span>📈</span> Gestión de Datos de Sensores
             </div>
             <button className="btn warning" onClick={limpiarHistorial}>
-              <span>🗑️</span> Limpiar Historial
+              <span>🧹</span> Limpiar Historial de Sensores
             </button>
             <button className="btn" onClick={exportarDatos}>
-              <span>📥</span> Exportar Datos
+              <span>📤</span> Exportar Datos de Sensores
             </button>
+          </div>
+
+          {/* Información de Sensores */}
+          <div className="control-group">
+            <div className="control-title">
+              <span>🔍</span> Sensores Activos
+            </div>
+            <ul>
+              <li>🔌 Sensor de Conductividad Eléctrica (EC)</li>
+              <li>🌡️ Sensor de Temperatura del Suelo</li>
+              <li>💡 Sensor de Luz Ambiental</li>
+            </ul>
           </div>
 
         </div>
