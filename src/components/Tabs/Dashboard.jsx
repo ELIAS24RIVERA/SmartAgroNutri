@@ -2,8 +2,26 @@ import React, { useState, useEffect, useRef } from "react";
 import { AppContext } from "../../context/AppContext.jsx";
 import "../../styles/Dashboard.css"
 
+// 🔹 Importamos Firebase
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, push } from "firebase/database";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDo-YMXIBublt25kf_7UD99opWgZzfopZI",
+  authDomain: "elias-82a93.firebaseapp.com",
+  databaseURL: "https://elias-82a93-default-rtdb.firebaseio.com",
+  projectId: "elias-82a93",
+  storageBucket: "elias-82a93.firebasestorage.app",
+  messagingSenderId: "339817378222",
+  appId: "1:339817378222:web:927d026e3df14f9351983f",
+  measurementId: "G-Q8M91HHTNQ"
+};
+// 🔹 Inicializamos Firebase y Firestore
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 export default function MonitorSuelo() {
-  const [esp32IP, setEsp32IP] = useState("192.168.1.100");
+  const [esp32IP, setEsp32IP] = useState("192.168.43.114");
   const [isConnected, setIsConnected] = useState(false);
   const [conductivity, setConductivity] = useState("--");
   const [temperature, setTemperature] = useState("--");
@@ -30,13 +48,26 @@ export default function MonitorSuelo() {
       const response = await fetch(`http://${esp32IP}/data`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
+
+      // 🔹 Guardamos datos en estado
       setConductivity(data.conductivity.toFixed(1));
       setTemperature(data.temperature.toFixed(1));
       setLight(data.lightA0);
       setLightDesc(data.lightDO === 0 ? "💡 Mucha luz detectada" : "🌑 Poca luz / sombra detectada");
       updateStatusBar("✅ ESP32 conectado y funcionando correctamente", "online");
       setIsConnected(true);
-      setLastUpdate(new Date().toLocaleString("es-ES"));
+      const fecha = new Date().toLocaleString("es-ES");
+      setLastUpdate(fecha);
+
+      // 🔹 Guardamos en Firestore
+      await addDoc(collection(db, "lecturasSuelo"), {
+        conductivity: data.conductivity,
+        temperature: data.temperature,
+        light: data.lightA0,
+        lightDesc: data.lightDO === 0 ? "Mucha luz" : "Poca luz",
+        fecha: new Date()
+      });
+
     } catch (error) {
       console.error("Error al conectar con ESP32:", error);
       updateStatusBar("❌ Error de conexión - Verifica la IP y que el ESP32 esté encendido", "offline");
@@ -70,10 +101,13 @@ export default function MonitorSuelo() {
   };
 
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
+  const testRef = ref(db, "lecturas");
+  push(testRef, {
+    test: "hola desde React",
+    timestamp: Date.now()
+  });
+}, []);
+
 
   return (
     <div className="main-container">

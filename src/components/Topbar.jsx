@@ -22,7 +22,7 @@ const Topbar = ({ onToggleMenu }) => {
           <span className="badge">3</span>
         </div>
         <div className="user-avatar" style={{ background: "#10b981" }}>
-          AH
+          HC
         </div>
       </div>
     </div>
