@@ -1,6 +1,7 @@
 // src/components/Tabs/Configuracion.jsx
 import React, { useState, useContext } from "react";
 import { AppContext } from "../../context/AppContext";
+import "../../styles/Configuracion.css";
 
 const Configuracion = () => {
   const { actualizarIntervalo, limpiarHistorial, exportarDatos } =
@@ -9,7 +10,7 @@ const Configuracion = () => {
 
   return (
     <div className="tab-content">
-      <h2>Configuración del Sistema Nitricion - ISTAP</h2>
+      <h2>Configuración del Sistema Nutrición - ISTAP</h2>
 
       <div className="control-section">
         <div className="control-grid">
@@ -17,7 +18,7 @@ const Configuracion = () => {
           {/* Configuración de Sensores */}
           <div className="control-group">
             <div className="control-title">
-              <span>🌿</span> Parámetros de Sensores ESP32
+              <span role="img" aria-label="hoja">🌿</span> Parámetros de Sensores ESP32
             </div>
 
             <div className="form-group">
@@ -33,28 +34,31 @@ const Configuracion = () => {
                 onChange={(e) => setIntervalo(Number(e.target.value))}
               />
             </div>
-            <button className="btn" onClick={() => actualizarIntervalo(intervalo)}>
-              <span>⏱️</span> Aplicar Intervalo
+            <button
+              className="btn"
+              onClick={() => actualizarIntervalo(intervalo)}
+            >
+              <span role="img" aria-label="reloj">⏱️</span> Aplicar Intervalo
             </button>
           </div>
 
           {/* Control de Datos */}
           <div className="control-group">
             <div className="control-title">
-              <span>📈</span> Gestión de Datos de Sensores
+              <span role="img" aria-label="grafico">📈</span> Gestión de Datos de Sensores
             </div>
             <button className="btn warning" onClick={limpiarHistorial}>
-              <span>🧹</span> Limpiar Historial de Sensores
+              <span role="img" aria-label="escoba">🧹</span> Limpiar Historial de Sensores
             </button>
             <button className="btn" onClick={exportarDatos}>
-              <span>📤</span> Exportar Datos de Sensores
+              <span role="img" aria-label="exportar">📤</span> Exportar Datos de Sensores
             </button>
           </div>
 
           {/* Información de Sensores */}
           <div className="control-group">
             <div className="control-title">
-              <span>🔍</span> Sensores Activos
+              <span role="img" aria-label="lupa">🔍</span> Sensores Activos
             </div>
             <ul>
               <li>🔌 Sensor de Conductividad Eléctrica (EC)</li>
