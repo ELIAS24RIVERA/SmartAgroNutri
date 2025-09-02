@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "../../styles/Dashboard.css";
 
 // 🔹 Firebase Realtime Database
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getDatabase, ref, push } from "firebase/database";
 
 // Configuración de Firebase
@@ -17,8 +17,8 @@ const firebaseConfig = {
   measurementId: "G-Q8M91HHTNQ",
 };
 
-// Inicializamos Firebase
-const app = initializeApp(firebaseConfig);
+// Inicializamos Firebase solo si no está inicializado
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
 export default function MonitorSuelo() {
@@ -129,11 +129,18 @@ export default function MonitorSuelo() {
     });
   };
 
-  // 🔹 Guardar prueba inicial en Firebase
+  // 🔹 Arrancar el envío automático al montar (sin grabar mensaje de prueba)
   useEffect(() => {
-    const testRef = ref(db, "lecturas");
-    push(testRef, { test: "hola desde React", timestamp: Date.now() });
-  }, []);
+    connectToESP32();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [esp32IP, intervalo]);
 
   return (
     <div className="main-container">
