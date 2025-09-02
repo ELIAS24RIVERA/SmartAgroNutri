@@ -40,10 +40,24 @@ export default function MonitorSuelo() {
   const refreshIconRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // 🔹 Calibraciones -------------------
-  const calibrarConductividad = (raw) => Number(((raw / 4095) * 2000).toFixed(1));
-  const calibrarTemperatura = (raw) => Number((raw + 2).toFixed(1));
-  const calibrarLuz = (raw) => Math.max(0, Math.min(100, (100 - (raw / 4095) * 100).toFixed(1)));
+  // 🔹 Calibraciones (ajustadas a rangos más reales) -------------------
+  // Conductividad típica en suelo: 0 - 5000 µS/cm
+  const calibrarConductividad = (raw) => {
+    const value = (raw / 4095) * 5000; // mapear a 0-5000 µS/cm
+    return Number(value.toFixed(0));
+  };
+
+  // Temperatura: sensor suele dar valores en °C directos, solo afinamos offset
+  const calibrarTemperatura = (raw) => {
+    const value = raw * 0.1 + 20; // ejemplo: raw=200 → 40°C
+    return Number(value.toFixed(1));
+  };
+
+  // Luz: 0 (oscuro) → 100% (máxima luz)
+  const calibrarLuz = (raw) => {
+    const value = 100 - (raw / 4095) * 100;
+    return Number(Math.max(0, Math.min(100, value)).toFixed(1));
+  };
 
   const updateStatusBar = (message, status) => {
     setStatusMessage(message);
