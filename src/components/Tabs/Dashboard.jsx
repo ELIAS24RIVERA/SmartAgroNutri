@@ -25,49 +25,29 @@ export default function MonitorSuelo() {
   const [esp32IP, setEsp32IP] = useState("192.168.43.114");
   const [isConnected, setIsConnected] = useState(false);
 
-  const [conductivity, setConductivity] = useState("--");
-  const [temperature, setTemperature] = useState("--");
-  const [light, setLight] = useState("--");
-  const [lightDesc, setLightDesc] = useState(
-    "Midiendo intensidad de luz en el entorno"
-  );
+  const [sensores, setSensores] = useState({
+    conductivity: { label: "Conductividad Eléctrica", value: "--", unit: "µS/cm", icon: "⚡", desc: "Concentración de sales y nutrientes" },
+    temperature: { label: "Temperatura del Suelo", value: "--", unit: "°C", icon: "🌡️", desc: "Actividad microbiana y raíces" },
+    light: { label: "Luz Ambiental", value: "--", unit: "%", icon: "💡", desc: "Midiendo intensidad de luz" },
+  });
 
-  const [statusMessage, setStatusMessage] = useState(
-    "🔄 Esperando conexión con ESP32..."
-  );
-  const [statusClass, setStatusClass] = useState(
-    "status-bar status-connecting"
-  );
+  const [statusMessage, setStatusMessage] = useState("🔄 Esperando conexión con ESP32...");
+  const [statusClass, setStatusClass] = useState("status-bar status-connecting");
   const [lastUpdate, setLastUpdate] = useState("--");
+  const [intervalo, setIntervalo] = useState(5);
+  const [historial, setHistorial] = useState([]);
 
   const refreshIconRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // 🔹 Función para actualizar barra de estado
+  // 🔹 Calibraciones -------------------
+  const calibrarConductividad = (raw) => Number(((raw / 4095) * 2000).toFixed(1));
+  const calibrarTemperatura = (raw) => Number((raw + 2).toFixed(1));
+  const calibrarLuz = (raw) => Math.max(0, Math.min(100, (100 - (raw / 4095) * 100).toFixed(1)));
+
   const updateStatusBar = (message, status) => {
     setStatusMessage(message);
     setStatusClass(`status-bar status-${status}`);
-  };
-
-  // 🔹 Funciones de calibración -------------------
-  const calibrarConductividad = (raw) => {
-    // Suponemos que raw = 0-4095 (ADC ESP32)
-    // Lo llevamos a µS/cm (ejemplo 0–2000)
-    const valor = (raw / 4095) * 2000;
-    return Number(valor.toFixed(1));
-  };
-
-  const calibrarTemperatura = (raw) => {
-    // Supongamos que el sensor entrega directamente °C
-    // Si llega desfasado, aplicamos un offset de +2 °C
-    const valor = raw + 2;
-    return Number(valor.toFixed(1));
-  };
-
-  const calibrarLuz = (raw) => {
-    // Raw ADC: 0 (mucha luz) → 4095 (oscuridad)
-    const porcentaje = 100 - (raw / 4095) * 100;
-    return Math.max(0, Math.min(100, porcentaje.toFixed(1)));
   };
 
   // 🔹 Obtener datos del ESP32
@@ -81,33 +61,31 @@ export default function MonitorSuelo() {
 
     try {
       const response = await fetch(`http://${esp32IP}/data`);
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
 
-      // ✅ Calibramos valores antes de mostrar
+      // Calibrar valores
       const cond = calibrarConductividad(data.conductivity);
       const temp = calibrarTemperatura(data.temperature);
       const luz = calibrarLuz(data.lightA0);
 
-      // Actualizamos en el estado
-      setConductivity(cond);
-      setTemperature(temp);
-      setLight(luz);
-      setLightDesc(
-        data.lightDO === 0
-          ? "💡 Mucha luz detectada"
-          : "🌑 Poca luz / sombra detectada"
-      );
+      // Actualizar estado dinámico
+      setSensores({
+        conductivity: { ...sensores.conductivity, value: cond },
+        temperature: { ...sensores.temperature, value: temp },
+        light: {
+          ...sensores.light,
+          value: luz,
+          desc: data.lightDO === 0 ? "💡 Mucha luz detectada" : "🌑 Poca luz / sombra detectada",
+        },
+      });
 
       updateStatusBar("✅ ESP32 conectado y funcionando correctamente", "online");
       setIsConnected(true);
-
       const fecha = new Date().toLocaleString("es-ES");
       setLastUpdate(fecha);
 
-      // 🔹 Guardamos datos calibrados en Firebase
+      // Guardar en Firebase
       const lecturasRef = ref(db, "lecturas");
       await push(lecturasRef, {
         conductivity: cond,
@@ -116,43 +94,37 @@ export default function MonitorSuelo() {
         lightDesc: data.lightDO === 0 ? "Mucha luz" : "Poca luz",
         timestamp: Date.now(),
       });
+
+      // Guardar historial local (máx 5 últimas lecturas)
+      setHistorial((prev) => [{ cond, temp, luz, fecha }, ...prev.slice(0, 4)]);
     } catch (error) {
       console.error("Error al conectar con ESP32:", error);
-      updateStatusBar(
-        "❌ Error de conexión - Verifica la IP y que el ESP32 esté encendido",
-        "offline"
-      );
+      updateStatusBar("❌ Error de conexión - Verifica la IP y el ESP32", "offline");
       setIsConnected(false);
 
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+
+      // 🔄 Reintentar en 10s
+      setTimeout(connectToESP32, 10000);
     } finally {
-      if (refreshIconRef.current)
-        refreshIconRef.current.classList.remove("loading");
+      if (refreshIconRef.current) refreshIconRef.current.classList.remove("loading");
     }
   };
 
-  // 🔹 Botón de conexión manual
   const connectToESP32 = () => {
     if (!esp32IP) {
       alert("Por favor ingresa la dirección IP del ESP32");
       return;
     }
 
-    const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (!ipPattern.test(esp32IP)) {
-      alert("Por favor ingresa una dirección IP válida");
-      return;
-    }
-
     updateStatusBar("Conectando con ESP32...", "connecting");
-
     fetchSensorData().then(() => {
       if (isConnected) {
         if (intervalRef.current) clearInterval(intervalRef.current);
-        intervalRef.current = setInterval(fetchSensorData, 5000); // cada 5s
+        intervalRef.current = setInterval(fetchSensorData, intervalo * 1000);
       }
     });
   };
@@ -167,12 +139,10 @@ export default function MonitorSuelo() {
     <div className="main-container">
       <div className="header">
         <h1>🌱 Monitor de Análisis de Suelo</h1>
-        <p>
-          Sistema ESP32 para monitoreo de conductividad, temperatura y luz
-          ambiental
-        </p>
+        <p>Sistema ESP32 para monitoreo de sensores en tiempo real</p>
       </div>
 
+      {/* Configuración de conexión */}
       <div className="connection-setup">
         <h3>⚙️ Configuración de Conexión</h3>
         <div className="ip-input-group">
@@ -184,55 +154,49 @@ export default function MonitorSuelo() {
             onKeyDown={(e) => e.key === "Enter" && connectToESP32()}
             placeholder="Dirección IP del ESP32 (ej: 192.168.1.100)"
           />
-          <button className="connect-btn" onClick={connectToESP32}>
-            Conectar
-          </button>
+          <select value={intervalo} onChange={(e) => setIntervalo(Number(e.target.value))}>
+            <option value={5}>Cada 5s</option>
+            <option value={10}>Cada 10s</option>
+            <option value={30}>Cada 30s</option>
+          </select>
+          <button className="connect-btn" onClick={connectToESP32}>Conectar</button>
         </div>
-        <p>
-          <strong>Nota:</strong> Verifica la IP de tu ESP32 en el Monitor Serie
-          de Arduino IDE
-        </p>
       </div>
 
-      <div id="statusBar" className={statusClass}>
-        {statusMessage}
-      </div>
+      {/* Barra de estado */}
+      <div id="statusBar" className={statusClass}>{statusMessage}</div>
 
+      {/* Tarjetas dinámicas de sensores */}
       <div className="sensors-grid">
-        <div className="sensor-card conductivity-card">
-          <div className="sensor-icon">⚡</div>
-          <div className="sensor-label">Conductividad Eléctrica</div>
-          <div className="sensor-value">{conductivity}</div>
-          <div className="sensor-unit">µS/cm</div>
-          <div className="sensor-description">
-            Indica la concentración de sales y nutrientes en el suelo
+        {Object.entries(sensores).map(([key, sensor]) => (
+          <div key={key} className={`sensor-card ${key}-card`}>
+            <div className="sensor-icon">{sensor.icon}</div>
+            <div className="sensor-label">{sensor.label}</div>
+            <div className="sensor-value">{sensor.value}</div>
+            <div className="sensor-unit">{sensor.unit}</div>
+            <div className="sensor-description">{sensor.desc}</div>
           </div>
-        </div>
-
-        <div className="sensor-card temperature-card">
-          <div className="sensor-icon">🌡️</div>
-          <div className="sensor-label">Temperatura del Suelo</div>
-          <div className="sensor-value">{temperature}</div>
-          <div className="sensor-unit">°C</div>
-          <div className="sensor-description">
-            Afecta la actividad microbiana y el crecimiento de raíces
-          </div>
-        </div>
-
-        <div className="sensor-card light-card">
-          <div className="sensor-icon">💡</div>
-          <div className="sensor-label">Luz Ambiental</div>
-          <div className="sensor-value">{light}</div>
-          <div className="sensor-unit">%</div>
-          <div className="sensor-description">{lightDesc}</div>
-        </div>
+        ))}
       </div>
 
+      {/* Controles */}
       <div className="controls">
         <button className="refresh-btn" onClick={fetchSensorData}>
           <span ref={refreshIconRef}>🔄</span> Actualizar Datos
         </button>
         <div className="last-update">Última actualización: {lastUpdate}</div>
+      </div>
+
+      {/* Historial local */}
+      <div className="history">
+        <h3>📜 Últimas Lecturas</h3>
+        <ul>
+          {historial.map((h, i) => (
+            <li key={i}>
+              {h.fecha} → 🌡️ {h.temp}°C | ⚡ {h.cond} µS/cm | 💡 {h.luz}%
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
