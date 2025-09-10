@@ -1,33 +1,138 @@
+/* src/styles/login.css */
+
 .login-container {
+  display: flex;
   height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Lado izquierdo */
+.login-left {
+  flex: 1;
+  background: linear-gradient(135deg, #0a0a0a, #1d1d1d);
+  color: #fff;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  color: white;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
 }
 
-.login-container form {
+/* 🔹 Logo como imagen */
+.logo-container img {
+  width: 100px;
+  height: auto;
+  margin-bottom: 10px;
+  background: transparent;
+  mix-blend-mode: screen; /* 👈 mezcla con el fondo */
+}
+
+
+/* 🔹 Texto debajo del logo */
+.logo-container h2 {
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 20px;
+  color: #fff;
+}
+
+/* 🔹 Logo alternativo como texto con degradado */
+.logo-text {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #2575fc, #6a11cb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.illustration img {
+  max-width: 300px;
+  margin: 20px 0;
+}
+
+.login-left h3 {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.login-left p {
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* Lado derecho */
+.login-right {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Logo dentro del formulario */
+.login-logo {
+  width: 90px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.login-box h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+/* Inputs */
+.login-box form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 10px;
+  gap: 15px;
 }
 
-.login-container input {
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
+.login-box input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
 }
 
-.login-container button {
-  padding: 10px;
-  border: none;
-  background: #ff9800;
+.login-box input:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+}
+
+/* Botón */
+.login-box button {
+  padding: 12px;
+  background: #2575fc;
   color: white;
-  border-radius: 5px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-box button:hover {
+  background: #1a5ecc;
+}
+
+.login-box small {
+  display: block;
+  margin-top: 15px;
+  font-size: 12px;
+  color: #555;
+}
+
+.login-box a {
+  color: #2575fc;
+  text-decoration: none;
 }

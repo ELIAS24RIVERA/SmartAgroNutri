@@ -1,8 +1,8 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaChartLine, FaHome, FaChartBar, FaCog, FaEnvelope, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
+import { FaChartLine, FaHome, FaChartBar, FaCog, FaEnvelope, FaSignOutAlt } from "react-icons/fa";
 
-export default function Sidebar({ isOpen }) {
+export default function Sidebar({ isOpen, onLogout }) {
     return (
         <div className={`sidebar ${isOpen ? "active" : ""}`}>
             <div className="sidebar-header">
@@ -32,7 +32,6 @@ export default function Sidebar({ isOpen }) {
                         <FaEnvelope /> Mensajes
                     </NavLink>
                 </li>
-
             </ul>
 
             <div className="sidebar-footer">
@@ -43,7 +42,11 @@ export default function Sidebar({ isOpen }) {
                         <div style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Administrador</div>
                     </div>
                 </div>
-                <a className="logout-btn"><FaSignOutAlt /> Cerrar sesión</a>
+
+                {/* ✅ Botón de cerrar sesión con funcionalidad */}
+                <button className="logout-btn" onClick={onLogout}>
+                    <FaSignOutAlt /> Cerrar sesión
+                </button>
             </div>
         </div>
     );

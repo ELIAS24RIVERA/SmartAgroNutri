@@ -37,7 +37,8 @@ export default function App() {
     <AppProvider>
       <Router>
         <div className="app">
-          <Sidebar isOpen={sidebarOpen} />
+          {/* ✅ Pasamos onLogout al Sidebar */}
+          <Sidebar isOpen={sidebarOpen} onLogout={() => setIsLoggedIn(false)} />
           <div className={`main-content ${sidebarOpen ? "" : "no-margin"}`}>
             <Topbar onToggleMenu={() => setSidebarOpen((v) => !v)} />
             <div className="content-area">
