@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../../styles/Dashboard.css";
 
+// 🔹 Recharts
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+
 // 🔹 Firebase Realtime Database
 import { initializeApp, getApps } from "firebase/app";
 import { getDatabase, ref, push } from "firebase/database";
@@ -21,6 +36,9 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
+// 🎨 Colores para los gráficos
+const COLORS = ["#8884d8", "#82ca9d", "#ffc658"];
+
 export default function MonitorSuelo() {
   const [esp32IP, setEsp32IP] = useState("192.168.43.114");
   const [isConnected, setIsConnected] = useState(false);
@@ -40,21 +58,21 @@ export default function MonitorSuelo() {
   const refreshIconRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // 🔹 Calibraciones (ajustadas a rangos más reales) -------------------
-  // Conductividad típica en suelo: 0 - 5000 µS/cm
+  // 🔹 Calibraciones -------------------
   const calibrarConductividad = (raw) => {
-    const value = (raw / 4095) * 5000; // mapear a 0-5000 µS/cm
+    if (raw == null || isNaN(raw)) return "--";
+    const value = (raw / 4095) * 5000;
     return Number(value.toFixed(0));
   };
 
-  // Temperatura: sensor suele dar valores en °C directos, solo afinamos offset
   const calibrarTemperatura = (raw) => {
-    const value = raw * 0.1 + 20; // ejemplo: raw=200 → 40°C
+    if (raw == null || isNaN(raw)) return "--";
+    const value = raw * 0.1 + 20;
     return Number(value.toFixed(1));
   };
 
-  // Luz: 0 (oscuro) → 100% (máxima luz)
   const calibrarLuz = (raw) => {
+    if (raw == null || isNaN(raw)) return "--";
     const value = 100 - (raw / 4095) * 100;
     return Number(Math.max(0, Math.min(100, value)).toFixed(1));
   };
@@ -78,24 +96,27 @@ export default function MonitorSuelo() {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
 
+      console.log("📡 Datos crudos recibidos:", data);
+
       // Calibrar valores
       const cond = calibrarConductividad(data.conductivity);
       const temp = calibrarTemperatura(data.temperature);
       const luz = calibrarLuz(data.lightA0);
 
       // Actualizar estado dinámico
-      setSensores({
-        conductivity: { ...sensores.conductivity, value: cond },
-        temperature: { ...sensores.temperature, value: temp },
+      setSensores((prev) => ({
+        conductivity: { ...prev.conductivity, value: cond },
+        temperature: { ...prev.temperature, value: temp },
         light: {
-          ...sensores.light,
+          ...prev.light,
           value: luz,
           desc: data.lightDO === 0 ? "💡 Mucha luz detectada" : "🌑 Poca luz / sombra detectada",
         },
-      });
+      }));
 
       updateStatusBar("✅ ESP32 conectado y funcionando correctamente", "online");
       setIsConnected(true);
+
       const fecha = new Date().toLocaleString("es-ES");
       setLastUpdate(fecha);
 
@@ -112,7 +133,7 @@ export default function MonitorSuelo() {
       // Guardar historial local (máx 5 últimas lecturas)
       setHistorial((prev) => [{ cond, temp, luz, fecha }, ...prev.slice(0, 4)]);
     } catch (error) {
-      console.error("Error al conectar con ESP32:", error);
+      console.error("❌ Error al conectar con ESP32:", error);
       updateStatusBar("❌ Error de conexión - Verifica la IP y el ESP32", "offline");
       setIsConnected(false);
 
@@ -121,7 +142,6 @@ export default function MonitorSuelo() {
         intervalRef.current = null;
       }
 
-      // 🔄 Reintentar en 10s
       setTimeout(connectToESP32, 10000);
     } finally {
       if (refreshIconRef.current) refreshIconRef.current.classList.remove("loading");
@@ -135,15 +155,13 @@ export default function MonitorSuelo() {
     }
 
     updateStatusBar("Conectando con ESP32...", "connecting");
+
     fetchSensorData().then(() => {
-      if (isConnected) {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        intervalRef.current = setInterval(fetchSensorData, intervalo * 1000);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(fetchSensorData, intervalo * 1000);
     });
   };
 
-  // 🔹 Arrancar el envío automático al montar (sin grabar mensaje de prueba)
   useEffect(() => {
     connectToESP32();
 
@@ -153,7 +171,6 @@ export default function MonitorSuelo() {
         intervalRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [esp32IP, intervalo]);
 
   return (
@@ -208,16 +225,49 @@ export default function MonitorSuelo() {
         <div className="last-update">Última actualización: {lastUpdate}</div>
       </div>
 
-      {/* Historial local */}
+      {/* 📊 Historial Gráfico */}
       <div className="history">
-        <h3>📜 Últimas Lecturas</h3>
-        <ul>
-          {historial.map((h, i) => (
-            <li key={i}>
-              {h.fecha} → 🌡️ {h.temp}°C | ⚡ {h.cond} µS/cm | 💡 {h.luz}%
-            </li>
-          ))}
-        </ul>
+        <h3>📊 Últimas Lecturas</h3>
+
+        {/* Gráfico de barras */}
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={historial.slice(0, 5).reverse()}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="fecha" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="cond" name="Conductividad (µS/cm)" fill="#8884d8" />
+            <Bar dataKey="temp" name="Temperatura (°C)" fill="#82ca9d" />
+            <Bar dataKey="luz" name="Luz (%)" fill="#ffc658" />
+          </BarChart>
+        </ResponsiveContainer>
+
+        {/* Gráfico circular */}
+        <h3>🥧 Promedio Últimas Lecturas</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={[
+                { name: "Conductividad", value: historial.reduce((a, b) => a + (b.cond || 0), 0) / (historial.length || 1) },
+                { name: "Temperatura", value: historial.reduce((a, b) => a + (b.temp || 0), 0) / (historial.length || 1) },
+                { name: "Luz", value: historial.reduce((a, b) => a + (b.luz || 0), 0) / (historial.length || 1) },
+              ]}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+              label
+            >
+              {COLORS.map((color, index) => (
+                <Cell key={`cell-${index}`} fill={color} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
