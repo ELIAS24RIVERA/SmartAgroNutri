@@ -1,62 +1,86 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
 import "../styles/login.css";
+import { FaUser, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Login({ onLogin }) {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (user === "admin" && pass === "1234") {
-      onLogin();
+      setError("");
+      if (onLogin) onLogin(); // 👈 avisa al App.jsx
+      navigate("/dashboard"); // 👈 entra al dashboard
     } else {
-      alert("Credenciales incorrectas");
+      setError("Credenciales incorrectas, inténtalo de nuevo.");
     }
+  };
+
+  const handleRegisterClick = (e) => {
+    e.preventDefault();
+    navigate("/register");
   };
 
   return (
     <div className="login-container">
-      {/* Columna izquierda */}
       <div className="login-left">
-        <div className="logo-container">
-          {/* ✅ Usa rutas relativas a /public */}
-          <img src="/logho.png" alt="Logo" className="logo" />
-          <h2>SMARTAGRONUTRI</h2>
+        <div className="login-image">
+          <img src="/portada.png" alt="Campo de cultivo" />
         </div>
-        <div className="illustration">
-          <img src="/portada.png" alt="Illustration" />
+        <div className="login-left-text">
+          <h3>Sistema Inteligente</h3>
+          <p>Gestión de sistema de nutricional de agrícola</p>
         </div>
-        <h3>Bienvenido de nuevo!</h3>
-        <p>Sistema de nutricional para área verdes - ISTAP</p>
       </div>
 
-      {/* Columna derecha */}
       <div className="login-right">
         <div className="login-box">
-          <img src="/logo.png" alt="Logo empresa" className="login-logo" />
-          <h2>INICIO DE SESIÓN</h2>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Usuario"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              required
-            />
-            <button type="submit">Iniciar sesión</button>
+          <img src="/logo.png" alt="Logo SmartRiego" className="login-logo" />
+          <h2 className="login-title">Iniciar sesión</h2>
+
+          {error && <p className="login-error">{error}</p>}
+
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="input-group">
+              <FaUser className="input-icon" />
+              <input
+                type="text"
+                placeholder="Usuario *"
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <FaLock className="input-icon" />
+              <input
+                type="password"
+                placeholder="Contraseña *"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="login-btn">
+              ACCEDER
+            </button>
           </form>
-          <small>
-            ¿Problemas con tu acceso? Contacta al{" "}
-            <a href="mailto:admin@istap.com">administrador</a>
-          </small>
+
+          <p className="register-text">
+            ¿No tienes una cuenta?{" "}
+            <a href="/register" onClick={handleRegisterClick}>
+              Regístrate aquí
+            </a>
+          </p>
+
+          <div className="android-icon">
+            <img src="/Android.png" alt="Disponible en Android" />
+          </div>
         </div>
       </div>
     </div>

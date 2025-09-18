@@ -1,138 +1,134 @@
-/* src/styles/login.css */
-
+/* Contenedor general */
 .login-container {
   display: flex;
-  height: 100vh;
-  font-family: "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background: #f5f6fa;
 }
 
-/* Lado izquierdo */
+/* Columna izquierda */
 .login-left {
   flex: 1;
-  background: linear-gradient(135deg, #0a0a0a, #1d1d1d);
+  background: linear-gradient(to bottom right, #4caf50, #2e7d32);
   color: #fff;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 40px;
+  align-items: center;
   text-align: center;
 }
-
-/* 🔹 Logo como imagen */
-.logo-container img {
-  width: 100px;
-  height: auto;
-  margin-bottom: 10px;
-  background: transparent;
-  mix-blend-mode: screen; /* 👈 mezcla con el fondo */
+.login-left img {
+  width: 80%;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.login-left-text h3 {
+  font-size: 2rem;
+  margin: 10px 0;
+}
+.login-left-text p {
+  font-size: 1.2rem;
 }
 
-
-/* 🔹 Texto debajo del logo */
-.logo-container h2 {
-  margin-top: 5px;
-  font-weight: bold;
-  font-size: 20px;
-  color: #fff;
-}
-
-/* 🔹 Logo alternativo como texto con degradado */
-.logo-text {
-  font-family: "Segoe UI", sans-serif;
-  font-size: 28px;
-  font-weight: bold;
-  background: linear-gradient(90deg, #2575fc, #6a11cb);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.illustration img {
-  max-width: 300px;
-  margin: 20px 0;
-}
-
-.login-left h3 {
-  font-size: 20px;
-  margin-top: 10px;
-}
-
-.login-left p {
-  font-size: 14px;
-  color: #ccc;
-}
-
-/* Lado derecho */
+/* Columna derecha */
 .login-right {
   flex: 1;
-  background: #fff;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  padding: 40px;
 }
-
 .login-box {
-  width: 100%;
+  background: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   max-width: 400px;
+  width: 100%;
   text-align: center;
 }
-
-/* Logo dentro del formulario */
 .login-logo {
-  width: 90px;
-  height: auto;
-  margin-bottom: 15px;
+  width: 100px;
+  margin-bottom: 10px;
 }
-
-.login-box h2 {
-  font-size: 22px;
+.login-title {
   margin-bottom: 20px;
-  color: #222;
+  color: #2e7d32;
 }
 
-/* Inputs */
-.login-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+/* Inputs con iconos */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
 }
-
-.login-box input {
-  padding: 12px;
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #888;
+}
+.input-group input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
+  transition: all 0.3s ease;
 }
-
-.login-box input:focus {
-  border-color: #2575fc;
-  box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+.input-group input:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
 /* Botón */
-.login-box button {
+.login-btn {
+  width: 100%;
+  background: #4caf50;
+  color: #fff;
   padding: 12px;
-  background: #2575fc;
-  color: white;
   border: none;
   border-radius: 8px;
-  font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease;
+}
+.login-btn:hover {
+  background: #43a047;
+}
+.login-btn:active {
+  transform: scale(0.98);
 }
 
-.login-box button:hover {
-  background: #1a5ecc;
+/* Error */
+.login-error {
+  color: #e53935;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
 }
 
-.login-box small {
-  display: block;
+/* Registro y Android */
+.register-text {
   margin-top: 15px;
-  font-size: 12px;
-  color: #555;
+  font-size: 0.9rem;
+}
+.register-text a {
+  color: #4caf50;
+  text-decoration: none;
+}
+.register-text a:hover {
+  text-decoration: underline;
+}
+.android-icon img {
+  width: 120px;
+  margin-top: 15px;
 }
 
-.login-box a {
-  color: #2575fc;
-  text-decoration: none;
+/* Responsive */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+  .login-left {
+    display: none;
+  }
 }
