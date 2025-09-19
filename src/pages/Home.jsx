@@ -13,45 +13,51 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="home-section">
+          {/* Texto + botón a la izquierda */}
+          <div className="home-content">
+            <motion.h2
+              className="home-subtitle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Monitoreo inteligente de tus áreas verdes
+            </motion.h2>
+
+            <motion.p
+              className="home-paragraph"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              Con sensores de conductividad eléctrica, temperatura del suelo y luz,
+              optimiza el riego y los nutrientes para mantener tus áreas verdes saludables.
+            </motion.p>
+
+            <motion.div
+              className="home-button-wrapper"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Link to="/login" className="home-button">
+                Ir al Dashboard
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Imagen a la derecha */}
           <motion.img
-            src="/images/areas-verdes.jpg"
+            src="/portada.png"
             alt="Áreas verdes con sensor"
             className="home-image"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           />
-
-          <motion.h2
-            className="home-subtitle"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            Monitoreo inteligente de tus áreas verdes
-          </motion.h2>
-
-          <motion.p
-            className="home-paragraph"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            Con sensores de conductividad eléctrica, temperatura del suelo y luz,
-            optimiza el riego y los nutrientes para mantener tus áreas verdes saludables.
-          </motion.p>
-
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.7 }}
-          >
-            <Link to="/login" className="home-button">
-              Ir al Dashboard
-            </Link>
-          </motion.div>
         </section>
 
+        {/* Tarjetas */}
         <section className="home-cards">
           <motion.div
             className="home-card"

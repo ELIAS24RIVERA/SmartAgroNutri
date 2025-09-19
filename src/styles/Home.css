@@ -14,12 +14,10 @@
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-
 .home-header h1 {
   font-size: 2rem;
   font-weight: 800;
 }
-
 @media (min-width:768px){
   .home-header h1{font-size:2.5rem;}
 }
@@ -43,8 +41,8 @@
   font-weight: 700;
   margin-bottom: 1rem;
   background: linear-gradient(90deg,#16a34a,#22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; /* ✅ un solo guion */
+  -webkit-text-fill-color: transparent; /* ✅ un solo guion */
 }
 
 .home-paragraph {
@@ -73,6 +71,13 @@
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
+/* Contenedor del botón → solo centra horizontalmente */
+.home-button-container {
+  display: flex;
+  justify-content: center; /* centra horizontal */
+  margin: 2rem 0;          /* separa arriba y abajo */
+}
+
 /* Tarjetas */
 .home-cards {
   max-width: 80rem;
@@ -85,7 +90,6 @@
 @media(min-width:768px){
   .home-cards{grid-template-columns:repeat(3,1fr);}
 }
-
 .home-card {
   background: white;
   border-radius: 1.25rem;
@@ -98,7 +102,6 @@
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
-
 .home-card-icon {
   font-size: 2.5rem;
   margin-bottom: 0.75rem;
@@ -107,13 +110,11 @@
 .home-card:hover .home-card-icon {
   transform: rotate(10deg) scale(1.2);
 }
-
 .home-card-title {
   font-weight: bold;
   font-size: 1.125rem;
   margin-bottom: 0.5rem;
 }
-
 .home-card-text {
   color: #4b5563;
 }
@@ -124,4 +125,30 @@
   color: white;
   padding: 1rem;
   text-align: center;
+}
+.home-section {
+  display: flex;
+  flex-direction: column; /* móvil: columna */
+  gap: 2rem;
+  padding: 2rem 1rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .home-section {
+    flex-direction: row; /* desktop: texto izquierda, imagen derecha */
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.home-content {
+  max-width: 36rem;
+  text-align: center; /* centra el texto en móvil */
+}
+
+.home-button-wrapper {
+  display: flex;
+  justify-content: center; /* centra el botón */
+  margin-top: 1.5rem;
 }
