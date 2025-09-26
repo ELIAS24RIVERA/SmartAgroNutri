@@ -8,19 +8,33 @@
 
 /* Header */
 .home-header {
-  background: linear-gradient(90deg,#15803d,#166534);
+  display: flex;
+  align-items: center;               /* centra verticalmente */
+  justify-content: center;           /* centra horizontalmente */
+  background: linear-gradient(90deg, #15803d, #166534);
   color: white;
-  padding: 2rem 1rem;
-  text-align: center;
+  padding: 1rem 2rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  text-align: center;
+  gap: 1rem;                         /* espacio entre logo y texto */
 }
+
+.home-logo {
+  height: 50px;                      /* tamaño del logo */
+}
+
 .home-header h1 {
   font-size: 2rem;
   font-weight: 800;
+  margin: 0;
 }
+
 @media (min-width:768px){
-  .home-header h1{font-size:2.5rem;}
+  .home-header h1 {
+    font-size: 2.5rem;
+  }
 }
+
 
 /* Imagen */
 .home-image {

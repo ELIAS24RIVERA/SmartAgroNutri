@@ -17,18 +17,14 @@ import "./styles/sidebar.css";
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // ✅ función para cerrar sesión
   const handleLogout = () => {
-    // Borra cualquier dato de sesión
-    localStorage.removeItem("usuario"); // si usas localStorage
-    // Redirige al inicio
-    window.location.href = "/"; // 👈 aquí te manda al inicio (Home)
+    localStorage.removeItem("usuario");
+    window.location.href = "/"; // 👈 aquí te manda al Home sólo al cerrar sesión
   };
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 992) setSidebarOpen(false);
-      else setSidebarOpen(true);
+      setSidebarOpen(window.innerWidth >= 992);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -39,30 +35,31 @@ export default function App() {
     <Router>
       <AppProvider>
         <Routes>
+          {/* Páginas públicas */}
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Registrar />} />
 
+          {/* Layout privado persistente */}
           <Route
-            path="/dashboard"
+            path="/*"
             element={
               <div className="app">
-                {/* ✅ pasamos handleLogout aquí */}
                 <Sidebar isOpen={sidebarOpen} onLogout={handleLogout} />
                 <div className={`main-content ${sidebarOpen ? "" : "no-margin"}`}>
                   <Topbar onToggleMenu={() => setSidebarOpen((v) => !v)} />
                   <div className="content-area">
-                    <Inicio />
+                    <Routes>
+                      <Route path="dashboard" element={<Inicio />} />
+                      <Route path="logs" element={<Logs />} />
+                      <Route path="configuracion" element={<Configuracion />} />
+                      <Route path="mensajes" element={<Mensajes />} />
+                    </Routes>
                   </div>
                 </div>
               </div>
             }
           />
-
-          <Route path="/logs" element={<Logs />} />
-          <Route path="/configuracion" element={<Configuracion />} />
-          <Route path="/mensajes" element={<Mensajes />} />
-
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Registrar />} />
         </Routes>
       </AppProvider>
     </Router>

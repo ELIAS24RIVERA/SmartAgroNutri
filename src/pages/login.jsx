@@ -1,23 +1,45 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import "../styles/login.css";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase"; // asegúrate de exportar auth en firebase.js
 
 export default function Login({ onLogin }) {
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user === "admin" && pass === "1234") {
-      setError("");
-      if (onLogin) onLogin(); // 👈 avisa al App.jsx
-      navigate("/dashboard"); // 👈 entra al dashboard
-    } else {
-      setError("Credenciales incorrectas, inténtalo de nuevo.");
+    setError("");
+
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+
+      if (onLogin) onLogin();
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err.code, err.message);
+      switch (err.code) {
+        case "auth/user-not-found":
+          setError("Usuario no registrado.");
+          break;
+        case "auth/wrong-password":
+          setError("Contraseña incorrecta.");
+          break;
+        case "auth/invalid-email":
+          setError("Correo inválido.");
+          break;
+        case "auth/configuration-not-found":
+          setError(
+            "Método de inicio de sesión no habilitado. Actívalo en la consola de Firebase."
+          );
+          break;
+        default:
+          setError("Error al iniciar sesión: " + err.message);
+      }
     }
   };
 
@@ -28,6 +50,7 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="login-container">
+      {/* Columna izquierda */}
       <div className="login-left">
         <div className="login-image">
           <img src="/portada.png" alt="Campo de cultivo" />
@@ -38,6 +61,7 @@ export default function Login({ onLogin }) {
         </div>
       </div>
 
+      {/* Columna derecha */}
       <div className="login-right">
         <div className="login-box">
           <img src="/logo.png" alt="Logo SmartRiego" className="login-logo" />
@@ -49,10 +73,10 @@ export default function Login({ onLogin }) {
             <div className="input-group">
               <FaUser className="input-icon" />
               <input
-                type="text"
-                placeholder="Usuario *"
-                value={user}
-                onChange={(e) => setUser(e.target.value)}
+                type="email"
+                placeholder="Correo electrónico *"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -67,7 +91,7 @@ export default function Login({ onLogin }) {
               />
             </div>
             <button type="submit" className="login-btn">
-              ACCEDER
+              INICIAR SESION
             </button>
           </form>
 
