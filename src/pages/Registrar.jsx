@@ -1,29 +1,36 @@
-// src/pages/Register.jsx
+// src/pages/Registrar.jsx
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { ref, set } from "firebase/database";
+import { auth, db } from "../firebaseConfig"; // ✅ ruta corregida
 import "../styles/register.css";
 
-export default function Register() {
+export default function RegistrarUsuario() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nombre, setNombre] = useState("");
   const [error, setError] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      // Crea usuario en Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      // Guarda datos extra en Firestore
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        email: email,
-        createdAt: new Date()
+      await set(ref(db, "usuarios/" + user.uid), {
+        nombre,
+        email,
+        rol: "USER",
+        createdAt: new Date().toISOString(),
       });
 
-      alert("Usuario registrado correctamente");
+      alert("✅ Usuario registrado correctamente");
+      setEmail("");
+      setPassword("");
+      setNombre("");
+      setError("");
     } catch (err) {
+      console.error("Error al registrar:", err);
       setError(err.message);
     }
   };
@@ -33,6 +40,13 @@ export default function Register() {
       <h2>Crear cuenta</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleRegister}>
+        <input
+          type="text"
+          placeholder="Nombre completo *"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
         <input
           type="email"
           placeholder="Correo electrónico *"

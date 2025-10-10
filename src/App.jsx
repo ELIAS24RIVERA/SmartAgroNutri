@@ -5,14 +5,15 @@ import { AppProvider } from "./context/AppContext";
 import Sidebar from "./components/Sidebar.jsx";
 import Topbar from "./components/Topbar.jsx";
 import Inicio from "./components/Tabs/Dashboard.jsx";
-import Logs from "./components/Tabs/Logs.jsx";
-import Configuracion from "./components/Tabs/Configuracion.jsx";
+import Logs from "./components/Tabs/Usuarios.jsx";
+import Estadistica from "./components/Tabs/Estadistica.jsx";
 import Mensajes from "./pages/Mensajes.jsx";
 import Login from "./pages/Login.jsx";
 import Registrar from "./pages/Registrar.jsx";
 import Home from "./pages/Home.jsx";
 
 import "./styles/sidebar.css";
+import Usuarios from "./components/Tabs/Usuarios.jsx";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -51,8 +52,8 @@ export default function App() {
                   <div className="content-area">
                     <Routes>
                       <Route path="dashboard" element={<Inicio />} />
-                      <Route path="logs" element={<Logs />} />
-                      <Route path="configuracion" element={<Configuracion />} />
+                      <Route path="Usuarios" element={<Usuarios />} />
+                      <Route path="Estadistica" element={<Estadistica />} />
                       <Route path="mensajes" element={<Mensajes />} />
                     </Routes>
                   </div>

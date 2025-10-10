@@ -31,18 +31,18 @@ export default function Sidebar({ isOpen, onLogout }) {
         </li>
         <li>
           <NavLink
-            to="/configuracion"
+            to="/Estadistica"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            <FaCog /> Configuración
+            <FaCog /> Estadistica
           </NavLink>
         </li>
         <li>
           <NavLink
-            to="/logs"
+            to="/Usuarios"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            <FaChartBar /> Logs
+            <FaChartBar /> Usuarios
           </NavLink>
         </li>
         <li>

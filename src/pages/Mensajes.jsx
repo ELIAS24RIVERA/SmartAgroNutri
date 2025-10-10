@@ -1,7 +1,7 @@
-// Mensaje.jsx
+// Mensajes.jsx
 import React, { useState, useEffect } from "react";
 import { initializeApp, getApps } from "firebase/app";
-import { getDatabase, ref, push, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, remove, update } from "firebase/database";
 
 // 🔹 Configuración de Firebase
 const firebaseConfig = {
@@ -19,109 +19,219 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
-export default function Mensaje() {
+export default function Mensajes() {
   const [mensajes, setMensajes] = useState([]);
 
-  useEffect(() => {
-    const sensoresRef = ref(db, "lecturas");
-
-    onValue(sensoresRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const ultimoKey = Object.keys(data).pop(); // última lectura
-        const { temperatura, luz, ec } = data[ultimoKey];
-
-        let mensajesGenerados = [];
-
-        // 🔹 Reglas de mensajes por sensor
-        if (temperatura > 35) {
-          mensajesGenerados.push("⚠️ La temperatura es muy alta 🌡️");
-        } else if (temperatura < 15) {
-          mensajesGenerados.push("⚠️ La temperatura es muy baja 🥶");
-        } else {
-          mensajesGenerados.push("✅ Temperatura dentro del rango 🌡️");
-        }
-
-        if (ec < 1) {
-          mensajesGenerados.push("⚠️ Baja conductividad, faltan nutrientes 🌱");
-        } else {
-          mensajesGenerados.push("✅ Nutrientes adecuados 🌱");
-        }
-
-        if (luz < 200) {
-          mensajesGenerados.push("⚠️ Baja luz, fotosíntesis insuficiente ☀️");
-        } else {
-          mensajesGenerados.push("✅ Luz suficiente ☀️");
-        }
-
-        // 🔹 Guardar mensajes en Firebase (historial)
-        const mensajesRef = ref(db, "mensajes");
-        mensajesGenerados.forEach((msg) => {
-          push(mensajesRef, {
-            texto: msg,
-            timestamp: Date.now(),
-          });
-        });
-      }
-    });
-  }, []);
-
-  // 🔹 Leer historial en tiempo real
+  // 🔹 Leer mensajes en tiempo real
   useEffect(() => {
     const mensajesRef = ref(db, "mensajes");
-
     onValue(mensajesRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const lista = Object.values(data).map((item) => ({
+        const lista = Object.entries(data).map(([id, item]) => ({
+          id,
           texto: item.texto,
           fecha: new Date(item.timestamp).toLocaleString("es-ES"),
+          leido: item.leido || false,
+          tipo: item.tipo || "info",
         }));
-        setMensajes(lista.reverse()); // último arriba
+        setMensajes(lista.reverse());
       } else {
         setMensajes([]);
       }
     });
   }, []);
 
-  return (
-    <div className="main-container">
-      <h1>💬 Mensajes Automáticos en Tiempo Real</h1>
-      <p>Se generan mensajes individuales por cada sensor.</p>
+  // 🔹 Marcar un mensaje como leído
+  const marcarLeido = (id) => {
+    const msgRef = ref(db, `mensajes/${id}`);
+    update(msgRef, { leido: true });
+  };
 
-      <h3>📜 Historial de mensajes</h3>
-      <div
-        style={{
-          maxHeight: "300px",
-          overflowY: "auto",
-          border: "1px solid #ddd",
-          padding: "10px",
-          borderRadius: "8px",
-          backgroundColor: "#fafafa",
-        }}
-      >
-        {mensajes.length > 0 ? (
-          mensajes.map((msg, index) => (
+  // 🔹 Eliminar un mensaje
+  const eliminarMensaje = (id) => {
+    const msgRef = ref(db, `mensajes/${id}`);
+    remove(msgRef);
+  };
+
+  // 🔹 Borrar todos los mensajes
+  const borrarTodos = () => {
+    const mensajesRef = ref(db, "mensajes");
+    remove(mensajesRef);
+  };
+
+  // 🔹 Estilo del color de alerta
+  const getColor = (texto) => {
+    if (texto.includes("BAJA")) return "#b71c1c"; // rojo oscuro
+    if (texto.includes("ALTA")) return "#b8860b"; // amarillo oscuro
+    return "#2e7d32"; // verde
+  };
+  // ========= Chat flotante =========
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [chatMessages, setChatMessages] = useState([]);
+    const [chatInput, setChatInput] = useState("");
+  
+    const handleSendMessage = () => {
+      if (!chatInput.trim()) return;
+      setChatMessages((prev) => [...prev, { from: "user", text: chatInput }]);
+      setTimeout(() => {
+        setChatMessages((prev) => [
+          ...prev,
+          { from: "bot", text: "🤖 Estoy aquí para ayudarte con el sistema de nutrición de áreas verdes 🌱" },
+        ]);
+      }, 800);
+      setChatInput("");
+    };
+
+  return (
+    <div
+      style={{
+        backgroundColor: "#111",
+        color: "#fff",
+        padding: "20px",
+        borderRadius: "15px",
+        boxShadow: "0 0 12px rgba(0,0,0,0.6)",
+      }}
+    >
+      <h2 style={{ marginBottom: "10px" }}>Mensajes del Sistema</h2>
+
+      <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+        <button
+          style={{
+            backgroundColor: "#2ecc71",
+            border: "none",
+            padding: "8px 12px",
+            borderRadius: "6px",
+            color: "#fff",
+            cursor: "pointer",
+          }}
+          onClick={() => setMensajes([...mensajes])}
+        >
+          📩 Todos los mensajes
+        </button>
+
+        <button
+          style={{
+            backgroundColor: "#e74c3c",
+            border: "none",
+            padding: "8px 12px",
+            borderRadius: "6px",
+            color: "#fff",
+            cursor: "pointer",
+          }}
+          onClick={borrarTodos}
+        >
+          🗑️ Borrar todos
+        </button>
+      </div>
+
+      {mensajes.length > 0 ? (
+        mensajes.map((msg) => (
+          <div
+            key={msg.id}
+            style={{
+              backgroundColor: getColor(msg.texto),
+              borderRadius: "10px",
+              padding: "12px",
+              marginBottom: "10px",
+              position: "relative",
+              boxShadow: "0px 2px 6px rgba(0,0,0,0.4)",
+            }}
+          >
+            <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+              {msg.texto}
+            </div>
+            <div style={{ fontSize: "0.9em", opacity: 0.9 }}>
+              📅 {msg.fecha}
+            </div>
+
             <div
-              key={index}
               style={{
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "6px",
-                backgroundColor: msg.texto.startsWith("⚠️")
-                  ? "#ffebee"
-                  : "#e8f5e9",
+                display: "flex",
+                gap: "10px",
+                marginTop: "8px",
               }}
             >
-              📝 {msg.texto}
-              <br />
-              <small>📅 {msg.fecha}</small>
+              {!msg.leido && (
+                <button
+                  onClick={() => marcarLeido(msg.id)}
+                  style={{
+                    backgroundColor: "#27ae60",
+                    border: "none",
+                    padding: "6px 10px",
+                    borderRadius: "6px",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontSize: "0.85em",
+                  }}
+                >
+                  ✔️ Marcar como leído
+                </button>
+              )}
+
+              <button
+                onClick={() => eliminarMensaje(msg.id)}
+                style={{
+                  backgroundColor: "#c0392b",
+                  border: "none",
+                  padding: "6px 10px",
+                  borderRadius: "6px",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontSize: "0.85em",
+                }}
+              >
+                🗑️ Eliminar
+              </button>
             </div>
-          ))
-        ) : (
-          <p>⚠️ No hay mensajes aún</p>
-        )}
-      </div>
+
+            {/* Punto verde si está activo */}
+            <div
+              style={{
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                backgroundColor: msg.leido ? "#555" : "#00ff00",
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+              }}
+            ></div>
+          </div>
+        ))
+      ) : (
+        <p style={{ textAlign: "center", color: "#bbb" }}>
+          ⚠️ No hay mensajes en el sistema
+        </p>
+      )}
+      {/* 💬 Chat flotante */}
+      <div className="chat-fab" onClick={() => setIsChatOpen(!isChatOpen)}>💬</div>
+
+      {isChatOpen && (
+        <div className="chat-box">
+          <div className="chat-header">Asistente Virtual 🌱</div>
+          <div className="chat-messages">
+            {chatMessages.map((msg, index) => (
+              <div
+                key={index}
+                className={`chat-message ${msg.from === "user" ? "user-msg" : "bot-msg"}`}
+              >
+                {msg.text}
+              </div>
+            ))}
+          </div>
+          <div className="chat-input">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder="Escribe tu mensaje..."
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            />
+            <button onClick={handleSendMessage}>Enviar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
