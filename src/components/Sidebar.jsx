@@ -9,7 +9,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-export default function Sidebar({ isOpen, onLogout }) {
+export default function Sidebar({ isOpen, onLogout, setVista }) {
   return (
     <div className={`sidebar ${isOpen ? "active" : ""}`}>
       <div className="sidebar-header">
@@ -21,9 +21,10 @@ export default function Sidebar({ isOpen, onLogout }) {
 
       <ul>
         <li>
-          {/* 👈 aquí cambiamos de "/" a "/dashboard" */}
+          {/* 👇 además de navegar, actualiza la vista sin desmontar el componente */}
           <NavLink
             to="/dashboard"
+            onClick={() => setVista("dashboard")}
             className={({ isActive }) => (isActive ? "active" : "")}
           >
             <FaHome /> Dashboard
@@ -32,14 +33,16 @@ export default function Sidebar({ isOpen, onLogout }) {
         <li>
           <NavLink
             to="/Estadistica"
+            onClick={() => setVista("Estadistica")}
             className={({ isActive }) => (isActive ? "active" : "")}
           >
-            <FaCog /> Estadistica
+            <FaCog /> Estadística
           </NavLink>
         </li>
         <li>
           <NavLink
             to="/Usuarios"
+            onClick={() => setVista("Usuarios")}
             className={({ isActive }) => (isActive ? "active" : "")}
           >
             <FaChartBar /> Usuarios
@@ -48,6 +51,7 @@ export default function Sidebar({ isOpen, onLogout }) {
         <li>
           <NavLink
             to="/mensajes"
+            onClick={() => setVista("mensajes")}
             className={({ isActive }) => (isActive ? "active" : "")}
           >
             <FaEnvelope /> Mensajes

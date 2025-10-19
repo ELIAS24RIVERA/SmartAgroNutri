@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, onValue, update } from "firebase/database";
 import { initializeApp, getApps } from "firebase/app";
 
-// Configuración de Firebase
+// ✅ Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDo-YMXIBublt25kf_7UD99opWgZzfopZI",
   authDomain: "elias-82a93.firebaseapp.com",
@@ -14,14 +14,17 @@ const firebaseConfig = {
   measurementId: "G-Q8M91HHTNQ",
 };
 
-// Evitar inicialización duplicada
+// ✅ Evita inicializar Firebase más de una vez
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
 
-  // Cargar datos de usuarios desde Firebase
+  // ✅ Leer usuarios en tiempo real
   useEffect(() => {
     const usuariosRef = ref(db, "usuarios");
     const unsubscribe = onValue(usuariosRef, (snapshot) => {
@@ -35,41 +38,41 @@ const Usuarios = () => {
         }));
         setUsuarios(lista);
       } else {
-        setUsuarios([]); // Si no hay usuarios, se asegura que el estado esté vacío
+        setUsuarios([]);
       }
     });
 
-    return () => unsubscribe(); // Limpiar la suscripción cuando el componente se desmonte
+    return () => unsubscribe();
   }, []);
 
-  // Cambiar rol del usuario
+  // ✅ Cambiar rol del usuario en la base de datos
   const handleRolChange = (id, nuevoRol) => {
     const userRef = ref(db, `usuarios/${id}`);
     update(userRef, { rol: nuevoRol });
   };
 
-  // Estilo para el badge del rol
+  // ✅ Colores según el rol
   const getBadgeColor = (rol) => {
-    if (rol === "ADMIN") return "#e74c3c"; // rojo
-    if (rol === "USER") return "#2ecc71"; // verde
-    return "#7f8c8d"; // gris
+    if (rol === "ADMIN") return "#e74c3c";
+    if (rol === "USER") return "#2ecc71";
+    return "#7f8c8d";
   };
-  // ========= Chat flotante =========
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [chatMessages, setChatMessages] = useState([]);
-    const [chatInput, setChatInput] = useState("");
-  
-    const handleSendMessage = () => {
-      if (!chatInput.trim()) return;
-      setChatMessages((prev) => [...prev, { from: "user", text: chatInput }]);
-      setTimeout(() => {
-        setChatMessages((prev) => [
-          ...prev,
-          { from: "bot", text: "🤖 Estoy aquí para ayudarte con el sistema de nutrición de áreas verdes 🌱" },
-        ]);
-      }, 800);
-      setChatInput("");
-    };
+
+  // ✅ Chat interno
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    setChatMessages((prev) => [...prev, { from: "user", text: chatInput }]);
+    setTimeout(() => {
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          from: "bot",
+          text: "🤖 Estoy aquí para ayudarte con el sistema de nutrición de áreas verdes 🌱",
+        },
+      ]);
+    }, 800);
+    setChatInput("");
+  };
 
   return (
     <div
@@ -83,6 +86,7 @@ const Usuarios = () => {
     >
       <h2 style={{ marginBottom: "20px" }}>Control de Usuarios</h2>
 
+      {/* ✅ Tabla de usuarios */}
       <table
         style={{
           width: "100%",
@@ -159,31 +163,125 @@ const Usuarios = () => {
           )}
         </tbody>
       </table>
+
       {/* 💬 Chat flotante */}
-      <div className="chat-fab" onClick={() => setIsChatOpen(!isChatOpen)}>💬</div>
+      <div
+        className="chat-fab"
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        style={{
+          position: "fixed",
+          bottom: "30px",
+          right: "30px",
+          backgroundColor: "#60a5fa",
+          color: "#fff",
+          borderRadius: "50%",
+          width: "60px",
+          height: "60px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          cursor: "pointer",
+          fontSize: "24px",
+          boxShadow: "0 0 10px rgba(0,0,0,0.5)",
+        }}
+      >
+        💬
+      </div>
 
       {isChatOpen && (
-        <div className="chat-box">
-          <div className="chat-header">Asistente Virtual 🌱</div>
-          <div className="chat-messages">
+        <div
+          className="chat-box"
+          style={{
+            position: "fixed",
+            bottom: "100px",
+            right: "30px",
+            backgroundColor: "#1c1c1c",
+            color: "#fff",
+            borderRadius: "10px",
+            width: "300px",
+            boxShadow: "0 0 10px rgba(0,0,0,0.5)",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            className="chat-header"
+            style={{
+              backgroundColor: "#222",
+              padding: "10px",
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            Asistente Virtual 🌱
+          </div>
+          <div
+            className="chat-messages"
+            style={{
+              flex: 1,
+              padding: "10px",
+              overflowY: "auto",
+              maxHeight: "200px",
+            }}
+          >
             {chatMessages.map((msg, index) => (
               <div
                 key={index}
-                className={`chat-message ${msg.from === "user" ? "user-msg" : "bot-msg"}`}
+                style={{
+                  textAlign: msg.from === "user" ? "right" : "left",
+                  marginBottom: "8px",
+                }}
               >
-                {msg.text}
+                <span
+                  style={{
+                    display: "inline-block",
+                    backgroundColor:
+                      msg.from === "user" ? "#60a5fa" : "#333",
+                    color: "#fff",
+                    padding: "6px 10px",
+                    borderRadius: "10px",
+                    maxWidth: "80%",
+                  }}
+                >
+                  {msg.text}
+                </span>
               </div>
             ))}
           </div>
-          <div className="chat-input">
+          <div
+            className="chat-input"
+            style={{
+              display: "flex",
+              borderTop: "1px solid #333",
+            }}
+          >
             <input
               type="text"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Escribe tu mensaje..."
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              style={{
+                flex: 1,
+                backgroundColor: "#111",
+                color: "#fff",
+                border: "none",
+                padding: "8px",
+              }}
             />
-            <button onClick={handleSendMessage}>Enviar</button>
+            <button
+              onClick={handleSendMessage}
+              style={{
+                backgroundColor: "#60a5fa",
+                color: "#fff",
+                border: "none",
+                padding: "8px 12px",
+                cursor: "pointer",
+              }}
+            >
+              Enviar
+            </button>
           </div>
         </div>
       )}
@@ -191,7 +289,7 @@ const Usuarios = () => {
   );
 };
 
-// Estilos reutilizables
+// ✅ Estilos base
 const thStyle = {
   padding: "12px",
   textAlign: "center",

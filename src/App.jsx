@@ -17,10 +17,11 @@ import Usuarios from "./components/Tabs/Usuarios.jsx";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [vista, setVista] = useState("dashboard"); // 👈 Estado actual de la vista
 
   const handleLogout = () => {
     localStorage.removeItem("usuario");
-    window.location.href = "/"; // 👈 aquí te manda al Home sólo al cerrar sesión
+    window.location.href = "/"; // 👈 Regresa al Home solo al cerrar sesión
   };
 
   useEffect(() => {
@@ -36,26 +37,37 @@ export default function App() {
     <Router>
       <AppProvider>
         <Routes>
-          {/* Páginas públicas */}
+          {/* 🔹 Páginas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registrar />} />
 
-          {/* Layout privado persistente */}
+          {/* 🔹 Layout privado persistente */}
           <Route
             path="/*"
             element={
               <div className="app">
-                <Sidebar isOpen={sidebarOpen} onLogout={handleLogout} />
+                <Sidebar
+                  isOpen={sidebarOpen}
+                  onLogout={handleLogout}
+                  setVista={setVista} // 👈 Pasamos la función para cambiar vista
+                />
                 <div className={`main-content ${sidebarOpen ? "" : "no-margin"}`}>
                   <Topbar onToggleMenu={() => setSidebarOpen((v) => !v)} />
                   <div className="content-area">
-                    <Routes>
-                      <Route path="dashboard" element={<Inicio />} />
-                      <Route path="Usuarios" element={<Usuarios />} />
-                      <Route path="Estadistica" element={<Estadistica />} />
-                      <Route path="mensajes" element={<Mensajes />} />
-                    </Routes>
+                    {/* 👇 Mantiene todos los componentes montados y visibles según vista */}
+                    <div style={{ display: vista === "dashboard" ? "block" : "none" }}>
+                      <Inicio />
+                    </div>
+                    <div style={{ display: vista === "Usuarios" ? "block" : "none" }}>
+                      <Usuarios />
+                    </div>
+                    <div style={{ display: vista === "Estadistica" ? "block" : "none" }}>
+                      <Estadistica />
+                    </div>
+                    <div style={{ display: vista === "mensajes" ? "block" : "none" }}>
+                      <Mensajes />
+                    </div>
                   </div>
                 </div>
               </div>

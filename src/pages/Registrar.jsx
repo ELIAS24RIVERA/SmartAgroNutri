@@ -1,8 +1,7 @@
 // src/pages/Registrar.jsx
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set } from "firebase/database";
-import { auth, db } from "../firebaseConfig"; // ✅ ruta corregida
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getDatabase, ref, set } from "firebase/database";
 import "../styles/register.css";
 
 export default function RegistrarUsuario() {
@@ -11,27 +10,36 @@ export default function RegistrarUsuario() {
   const [nombre, setNombre] = useState("");
   const [error, setError] = useState("");
 
+  // ✅ Inicializamos Auth y Database aquí (evita conflictos con múltiples inicializaciones)
+  const auth = getAuth();
+  const db = getDatabase();
+
   const handleRegister = async (e) => {
     e.preventDefault();
+
     try {
+      // ✅ Crear usuario en Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // ✅ Guardar información del usuario en Realtime Database
       await set(ref(db, "usuarios/" + user.uid), {
-        nombre,
-        email,
-        rol: "USER",
+        nombre: nombre,
+        email: user.email,
+        rol: "USER", // puedes cambiar a "ADMIN" si lo necesitas
         createdAt: new Date().toISOString(),
       });
 
       alert("✅ Usuario registrado correctamente");
+
+      // ✅ Limpiar los campos
       setEmail("");
       setPassword("");
       setNombre("");
       setError("");
     } catch (err) {
       console.error("Error al registrar:", err);
-      setError(err.message);
+      setError("❌ " + err.message);
     }
   };
 

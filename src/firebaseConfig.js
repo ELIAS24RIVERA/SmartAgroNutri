@@ -1,6 +1,6 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
-import { getAuth } from "firebase/auth"; // Importamos la autenticación
+import { getAuth } from "firebase/auth";
 
 // 🔹 Configuración de Firebase
 const firebaseConfig = {
@@ -14,10 +14,11 @@ const firebaseConfig = {
   measurementId: "G-Q8M91HHTNQ",
 };
 
-// Inicializamos Firebase solo una vez
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app); // Obtenemos la referencia a la base de datos de Firebase
-const auth = getAuth(app);  // Obtenemos la instancia de autenticación
+// ✅ Inicializa Firebase solo si no existe una app previa
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Exportamos `db` y `auth` para usarlos en otros archivos
-export { db, auth }; 
+// 🔹 Inicializa los servicios de Firebase
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+export { db, auth };
