@@ -4,16 +4,15 @@ import { initializeApp, getApps } from "firebase/app";
 
 // ✅ Configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDo-YMXIBublt25kf_7UD99opWgZzfopZI",
-  authDomain: "elias-82a93.firebaseapp.com",
-  databaseURL: "https://elias-82a93-default-rtdb.firebaseio.com",
-  projectId: "elias-82a93",
-  storageBucket: "elias-82a93.firebasestorage.app",
-  messagingSenderId: "339817378222",
-  appId: "1:339817378222:web:927d026e3df14f9351983f",
-  measurementId: "G-Q8M91HHTNQ",
+  apiKey: "AIzaSyDGoGj_ecO1OOZjXA5EJZVWJK-ygPsOSNI",
+  authDomain: "apppruebi.firebaseapp.com",
+  databaseURL: "https://apppruebi-default-rtdb.firebaseio.com",
+  projectId: "apppruebi",
+  storageBucket: "apppruebi.firebasestorage.app",
+  messagingSenderId: "381833616823",
+  appId: "1:381833616823:web:8236f28228abf0b1d45c32",
+  measurementId: "G-J4NKTB2KHS"
 };
-
 // ✅ Evita inicializar Firebase más de una vez
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);

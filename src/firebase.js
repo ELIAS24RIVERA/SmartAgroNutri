@@ -1,20 +1,22 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase, ref, push } from "firebase/database";
+// src/firebase.js
+import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database";
+import { getAuth } from "firebase/auth"; 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDo-YMXIBublt25kf_7UD99opWgZzfopZI",
-  authDomain: "elias-82a93.firebaseapp.com",
-  databaseURL: "https://elias-82a93-default-rtdb.firebaseio.com",
-  projectId: "elias-82a93",
-  storageBucket: "elias-82a93.appspot.com", // 👈 importante .appspot.com
-  messagingSenderId: "339817378222",
-  appId: "1:339817378222:web:927d026e3df14f9351983f",
-  measurementId: "G-Q8M91HHTNQ",
+  apiKey: "AIzaSyDGoGj_ecO1OOZjXA5EJZVWJK-ygPsOSNI",
+  authDomain: "apppruebi.firebaseapp.com",
+  databaseURL: "https://apppruebi-default-rtdb.firebaseio.com/",
+  projectId: "apppruebi",
+  storageBucket: "apppruebi.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdefg12345",
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Inicialización
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app); 
 
-export const auth = getAuth(app);
-export const db = getDatabase(app);
-export { ref, push };
+// Exporta todo lo que necesites
+export { app, db, auth };
