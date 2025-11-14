@@ -1,8 +1,7 @@
 // src/firebaseApi.js
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, off } from "firebase/database";
 import { db } from "./firebase";
 
-// ✅ Ya exportamos db si lo necesitas en otros lados
 export { db };
 
 /**
@@ -10,9 +9,13 @@ export { db };
  */
 export const listenDatos = (callback) => {
   const datosRef = ref(db, "datos");
-  onValue(datosRef, (snapshot) => {
+
+  // ⚠️ La corrección necesaria:
+  const unsubscribe = onValue(datosRef, (snapshot) => {
     callback(snapshot.val());
   });
+
+  return () => off(datosRef);   // ← ESTA ES LA ÚNICA COSA QUE FALTABA
 };
 
 /**
@@ -24,7 +27,6 @@ export const listenHistorial = (callback) => {
     const data = snapshot.val();
 
     if (data) {
-      // Convierte el objeto {timestamp: {...}} en un arreglo
       const formatted = Object.entries(data).map(([key, value]) => ({
         id: key,
         ...value,

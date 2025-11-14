@@ -1,393 +1,111 @@
-/* Reset de márgenes y paddings */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Estilos generales para el cuerpo */
-body {
-  font-family: 'Arial', sans-serif;
-  background: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.dashboard-container {
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  background: #f0f4f8;
   min-height: 100vh;
 }
 
-/* Contenedor principal */
-.main-container {
-  width: 100%;
-  max-width: 1200px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.main-container:hover {
-  transform: translateY(-10px);
-}
-
-/* Encabezado */
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.header h1 {
-  font-size: 36px;
-  color: #4e73df;
-  margin-bottom: 10px;
+.dashboard-title {
+  font-size: 1.8rem;
   font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.header p {
-  font-size: 16px;
-  color: #555;
-}
-
-/* Barra de estado */
-#statusBar {
-  padding: 10px;
-  margin: 20px 0;
-  font-size: 16px;
-  text-align: center;
-  border-radius: 5px;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.status-bar.status-connecting {
-  background-color: #f39c12;
-}
-
-.status-bar.status-online {
-  background-color: #2ecc71;
-}
-
-.status-bar.status-offline {
-  background-color: #e74c3c;
-}
-
-/* Contenedor de sensores */
-.sensors-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.sensor-card {
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sensor-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
-}
-
-.sensor-icon {
-  font-size: 40px;
-  margin-bottom: 15px;
-  transition: transform 0.3s ease;
-}
-
-.sensor-card:hover .sensor-icon {
-  transform: scale(1.2);
-}
-
-.sensor-label {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.sensor-value {
-  font-size: 32px;
-  margin-bottom: 10px;
-  font-weight: bold;
-  letter-spacing: 1px;
-}
-
-.sensor-unit {
-  font-size: 16px;
-}
-
-.sensor-description {
-  font-size: 14px;
-  color: #f1f1f1;
-  opacity: 0.8;
-}
-
-/* Configuración */
-.connection-setup {
+  color: #1a2e46;
   margin-bottom: 20px;
-  text-align: center;
 }
 
-.connection-setup h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.ip-input-group {
+.connection-section {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
+  gap: 10px;
+  margin-bottom: 25px;
 }
 
-.ip-input {
-  width: 250px;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 10px;
+.connection-section label {
+  font-weight: 600;
+  color: #1a2e46;
+}
+
+.connection-section input {
+  padding: 8px 12px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   outline: none;
-  transition: border-color 0.3s ease;
+  width: 150px;
 }
 
-.ip-input:focus {
-  border-color: #0072ff;
-}
-
-select {
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-select:focus {
-  border-color: #0072ff;
-}
-
-.connect-btn {
-  background: #0072ff;
-  color: white;
-  padding: 12px 25px;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
+.connection-section button {
+  background: #073b4c;
+  color: #fff;
   border: none;
-  margin-top: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.connect-btn:hover {
-  background: #005bb5;
-  transform: scale(1.05);
-}
-
-.connect-btn:active {
-  transform: scale(1);
-}
-
-/* Controles de actualización */
-.controls {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.refresh-btn {
-  background: #3498db;
-  color: white;
-  padding: 12px 25px;
-  border-radius: 10px;
-  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-weight: 600;
+  transition: background 0.3s;
 }
 
-.refresh-btn:hover {
-  background: #2980b9;
-  transform: scale(1.05);
+.connection-section button:hover {
+  background: #0a4e63;
 }
 
-.refresh-btn:active {
-  transform: scale(1);
-}
-
-.last-update {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #555;
-}
-
-/* Panel adicional */
-.dashboard-container {
-  margin-top: 40px;
-}
-
-.status-panel {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.cards-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
   gap: 20px;
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  border-radius: 15px;
+  margin-bottom: 25px;
+}
+
+.card {
+  color: #1a2e46;
   padding: 20px;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.status-item {
+  border-radius: 15px;
+  width: 200px;
   text-align: center;
-  padding: 10px;
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
 }
 
-.status-title {
-  font-size: 16px;
-  font-weight: bold;
-  display: block;
-}
-
-.status-value {
-  font-size: 24px;
-  margin-top: 10px;
-  font-weight: bold;
-  letter-spacing: 1px;
-}
-
-.status-item:hover {
+.card:hover {
   transform: translateY(-5px);
 }
 
-.status-panel:hover {
-  background: linear-gradient(135deg, #0072ff, #00c6ff);
+.card.temp {
+  background: linear-gradient(135deg, #d1f7c4, #a3e635);
 }
 
-/* Adaptación para pantallas pequeñas */
-@media (max-width: 768px) {
-  .sensors-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .status-panel {
-    grid-template-columns: 1fr 1fr;
-  }
+.card.hum {
+  background: linear-gradient(135deg, #bef0d3, #86efac);
 }
 
-@media (max-width: 480px) {
-  .sensors-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .status-panel {
-    grid-template-columns: 1fr;
-  }
-}
-/* 💬 Chat flotante */
-.chat-fab {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background-color: #32c5ff;
-  color: white;
-  font-size: 24px;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-  transition: 0.3s ease;
+.card.luz {
+  background: linear-gradient(135deg, #fff6b7, #facc15);
 }
 
-.chat-fab:hover {
-  background-color: #28b4eb;
-  transform: scale(1.1);
+.card h2 {
+  font-size: 2rem;
+  margin: 0;
 }
 
-/* Caja del chat */
-.chat-box {
-  position: fixed;
-  bottom: 100px;
-  right: 25px;
-  width: 320px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+.card p {
+  font-weight: 600;
+  margin-top: 5px;
 }
 
-.chat-header {
-  background: #32c5ff;
-  color: white;
-  padding: 10px;
-  font-weight: bold;
-  text-align: center;
+.info-panel {
+  background: linear-gradient(90deg, #16a34a 0%, #22c55e 40%, #15803d 100%);
+  color: #fff;
+  padding: 25px;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.chat-messages {
-  flex: 1;
-  padding: 10px;
-  max-height: 250px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.info-panel p {
+  margin: 0;
 }
 
-.chat-message {
-  padding: 8px 12px;
-  border-radius: 8px;
-  max-width: 80%;
-  word-wrap: break-word;
-}
-
-.user-msg {
-  background: #32c5ff;
-  color: white;
-  align-self: flex-end;
-}
-
-.bot-msg {
-  background: #f1f1f1;
-  align-self: flex-start;
-}
-
-.chat-input {
-  display: flex;
-  border-top: 1px solid #ddd;
-}
-
-.chat-input input {
-  flex: 1;
-  border: none;
-  padding: 10px;
-  outline: none;
-}
-
-.chat-input button {
-  background: #32c5ff;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-}
-
-.chat-input button:hover {
-  background: #28b4eb;
+.loading-text {
+  color: #1a2e46;
 }

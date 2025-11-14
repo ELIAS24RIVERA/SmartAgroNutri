@@ -9,7 +9,7 @@ export default function Home() {
     <div className="home-container">
       <header className="home-header">
         <img src="/logoo.png" alt="Logo SmartRiego" className="home-logo" />
-        <h1>Sistema Nutricional de Áreas Verdes – ISTAP</h1>
+        <h1>Sistema de Monitoreo Nutricional de Áreas Verdes.</h1>
       </header>
 
 

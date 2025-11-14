@@ -11,17 +11,15 @@ const firebaseConfig = {
   storageBucket: "apppruebi.firebasestorage.app",
   messagingSenderId: "381833616823",
   appId: "1:381833616823:web:8236f28228abf0b1d45c32",
-  measurementId: "G-J4NKTB2KHS"
+  measurementId: "G-J4NKTB2KHS",
 };
+
 // ✅ Evita inicializar Firebase más de una vez
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
 
   // ✅ Leer usuarios en tiempo real
   useEffect(() => {
@@ -57,20 +55,16 @@ const Usuarios = () => {
     return "#7f8c8d";
   };
 
-  // ✅ Chat interno
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
-    setChatMessages((prev) => [...prev, { from: "user", text: chatInput }]);
-    setTimeout(() => {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          from: "bot",
-          text: "🤖 Estoy aquí para ayudarte con el sistema de nutrición de áreas verdes 🌱",
-        },
-      ]);
-    }, 800);
-    setChatInput("");
+  // ✅ Estilos comunes
+  const thStyle = {
+    padding: "12px",
+    borderBottom: "2px solid #333",
+    color: "#00b894",
+  };
+
+  const tdStyle = {
+    padding: "10px",
+    borderBottom: "1px solid #333",
   };
 
   return (
@@ -162,145 +156,8 @@ const Usuarios = () => {
           )}
         </tbody>
       </table>
-
-      {/* 💬 Chat flotante */}
-      <div
-        className="chat-fab"
-        onClick={() => setIsChatOpen(!isChatOpen)}
-        style={{
-          position: "fixed",
-          bottom: "30px",
-          right: "30px",
-          backgroundColor: "#60a5fa",
-          color: "#fff",
-          borderRadius: "50%",
-          width: "60px",
-          height: "60px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          cursor: "pointer",
-          fontSize: "24px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.5)",
-        }}
-      >
-        💬
-      </div>
-
-      {isChatOpen && (
-        <div
-          className="chat-box"
-          style={{
-            position: "fixed",
-            bottom: "100px",
-            right: "30px",
-            backgroundColor: "#1c1c1c",
-            color: "#fff",
-            borderRadius: "10px",
-            width: "300px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.5)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            className="chat-header"
-            style={{
-              backgroundColor: "#222",
-              padding: "10px",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            Asistente Virtual 🌱
-          </div>
-          <div
-            className="chat-messages"
-            style={{
-              flex: 1,
-              padding: "10px",
-              overflowY: "auto",
-              maxHeight: "200px",
-            }}
-          >
-            {chatMessages.map((msg, index) => (
-              <div
-                key={index}
-                style={{
-                  textAlign: msg.from === "user" ? "right" : "left",
-                  marginBottom: "8px",
-                }}
-              >
-                <span
-                  style={{
-                    display: "inline-block",
-                    backgroundColor:
-                      msg.from === "user" ? "#60a5fa" : "#333",
-                    color: "#fff",
-                    padding: "6px 10px",
-                    borderRadius: "10px",
-                    maxWidth: "80%",
-                  }}
-                >
-                  {msg.text}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div
-            className="chat-input"
-            style={{
-              display: "flex",
-              borderTop: "1px solid #333",
-            }}
-          >
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Escribe tu mensaje..."
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              style={{
-                flex: 1,
-                backgroundColor: "#111",
-                color: "#fff",
-                border: "none",
-                padding: "8px",
-              }}
-            />
-            <button
-              onClick={handleSendMessage}
-              style={{
-                backgroundColor: "#60a5fa",
-                color: "#fff",
-                border: "none",
-                padding: "8px 12px",
-                cursor: "pointer",
-              }}
-            >
-              Enviar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
-};
-
-// ✅ Estilos base
-const thStyle = {
-  padding: "12px",
-  textAlign: "center",
-  fontWeight: "bold",
-  color: "#ddd",
-  borderBottom: "2px solid #333",
-};
-
-const tdStyle = {
-  padding: "10px",
-  color: "#ccc",
-  textAlign: "center",
 };
 
 export default Usuarios;

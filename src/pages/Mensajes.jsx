@@ -1,87 +1,58 @@
-// Mensajes.jsx
+// src/components/Mensajes.jsx
 import React, { useState, useEffect } from "react";
-import { initializeApp, getApps } from "firebase/app";
-import { getDatabase, ref, onValue, remove, update } from "firebase/database";
-
-// 🔹 Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDGoGj_ecO1OOZjXA5EJZVWJK-ygPsOSNI",
-  authDomain: "apppruebi.firebaseapp.com",
-  databaseURL: "https://apppruebi-default-rtdb.firebaseio.com",
-  projectId: "apppruebi",
-  storageBucket: "apppruebi.firebasestorage.app",
-  messagingSenderId: "381833616823",
-  appId: "1:381833616823:web:8236f28228abf0b1d45c32",
-  measurementId: "G-J4NKTB2KHS",
-};
-
-// 🔹 Inicializar Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getDatabase(app);
+import { ref, onValue, remove, update } from "firebase/database";
+import { db } from "../firebase";
 
 export default function Mensajes() {
   const [mensajes, setMensajes] = useState([]);
 
-  // 🔹 Leer mensajes en tiempo real
+  // 🔹 Leer mensajes directamente desde /datos (solo valores simples)
   useEffect(() => {
-    const mensajesRef = ref(db, "mensajes");
-    onValue(mensajesRef, (snapshot) => {
+    const mensajesRef = ref(db, "datos");
+
+    const unsubscribe = onValue(mensajesRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const lista = Object.entries(data).map(([id, item]) => ({
+
+        // Convertir cada dato en un mensaje simple
+        const lista = Object.entries(data).map(([id, texto]) => ({
           id,
-          texto: item.texto,
-          fecha: new Date(item.timestamp).toLocaleString("es-ES"),
-          leido: item.leido || false,
-          tipo: item.tipo || "info",
+          texto: typeof texto === "string" ? texto : JSON.stringify(texto),
+          fecha: "Sin fecha",
+          leido: false,
+          tipo: "info",
         }));
+
         setMensajes(lista.reverse());
       } else {
         setMensajes([]);
       }
     });
+
+    return () => unsubscribe();
   }, []);
 
-  // 🔹 Marcar un mensaje como leído
+  // 🔹 Marcar como leído
   const marcarLeido = (id) => {
-    const msgRef = ref(db, `mensajes/${id}`);
-    update(msgRef, { leido: true });
+    update(ref(db, `datos/${id}`), { leido: true });
   };
 
   // 🔹 Eliminar un mensaje
   const eliminarMensaje = (id) => {
-    const msgRef = ref(db, `mensajes/${id}`);
-    remove(msgRef);
+    remove(ref(db, `datos/${id}`));
   };
 
-  // 🔹 Borrar todos los mensajes
+  // 🔹 Borrar todos
   const borrarTodos = () => {
-    const mensajesRef = ref(db, "mensajes");
-    remove(mensajesRef);
+    remove(ref(db, "datos"));
   };
 
-  // 🔹 Estilo del color de alerta
+  // 🔹 Colores según el texto
   const getColor = (texto) => {
-    if (texto.includes("BAJA")) return "#b71c1c"; // rojo oscuro
-    if (texto.includes("ALTA")) return "#b8860b"; // amarillo oscuro
-    return "#2e7d32"; // verde
+    if (texto.toUpperCase().includes("BAJA")) return "#b71c1c";
+    if (texto.toUpperCase().includes("ALTA")) return "#b8860b";
+    return "#2e7d32";
   };
-  // ========= Chat flotante =========
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [chatMessages, setChatMessages] = useState([]);
-    const [chatInput, setChatInput] = useState("");
-  
-    const handleSendMessage = () => {
-      if (!chatInput.trim()) return;
-      setChatMessages((prev) => [...prev, { from: "user", text: chatInput }]);
-      setTimeout(() => {
-        setChatMessages((prev) => [
-          ...prev,
-          { from: "bot", text: "🤖 Estoy aquí para ayudarte con el sistema de nutrición de áreas verdes 🌱" },
-        ]);
-      }, 800);
-      setChatInput("");
-    };
 
   return (
     <div
@@ -107,7 +78,7 @@ export default function Mensajes() {
           }}
           onClick={() => setMensajes([...mensajes])}
         >
-          📩 Todos los mensajes
+          📩 Actualizar lista
         </button>
 
         <button
@@ -141,17 +112,12 @@ export default function Mensajes() {
             <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
               {msg.texto}
             </div>
+
             <div style={{ fontSize: "0.9em", opacity: 0.9 }}>
               📅 {msg.fecha}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginTop: "8px",
-              }}
-            >
+            <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
               {!msg.leido && (
                 <button
                   onClick={() => marcarLeido(msg.id)}
@@ -185,7 +151,6 @@ export default function Mensajes() {
               </button>
             </div>
 
-            {/* Punto verde si está activo */}
             <div
               style={{
                 width: "10px",
@@ -203,34 +168,6 @@ export default function Mensajes() {
         <p style={{ textAlign: "center", color: "#bbb" }}>
           ⚠️ No hay mensajes en el sistema
         </p>
-      )}
-      {/* 💬 Chat flotante */}
-      <div className="chat-fab" onClick={() => setIsChatOpen(!isChatOpen)}>💬</div>
-
-      {isChatOpen && (
-        <div className="chat-box">
-          <div className="chat-header">Asistente Virtual 🌱</div>
-          <div className="chat-messages">
-            {chatMessages.map((msg, index) => (
-              <div
-                key={index}
-                className={`chat-message ${msg.from === "user" ? "user-msg" : "bot-msg"}`}
-              >
-                {msg.text}
-              </div>
-            ))}
-          </div>
-          <div className="chat-input">
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Escribe tu mensaje..."
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            />
-            <button onClick={handleSendMessage}>Enviar</button>
-          </div>
-        </div>
       )}
     </div>
   );
