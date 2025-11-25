@@ -1,24 +1,43 @@
 // src/pages/Dashboard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { listenDatos } from "../../firebaseApi";
 import "../../styles/Dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
 
-  useEffect(() => {
-    const stopListening = listenDatos((newData) => {
+  // Guardar referencia del listener actual
+  const listenerRef = useRef(null);
+
+  // 🔹 FUNCIÓN REAL DEL BOTÓN ACTUALIZAR
+  const loadData = () => {
+    console.log("🔄 Actualizando datos manualmente...");
+
+    // Si ya había un listener, lo desactivamos
+    if (listenerRef.current && typeof listenerRef.current === "function") {
+      listenerRef.current();
+    }
+
+    // Crear un nuevo listener
+    listenerRef.current = listenDatos((newData) => {
       console.log("📥 Datos desde Firebase:", newData);
 
       if (newData && typeof newData === "object") {
         setData(newData);
+        setLastUpdate(new Date().toLocaleTimeString());
       } else {
         setData(null);
       }
     });
+  };
+
+  // 🔹 Primera carga de datos
+  useEffect(() => {
+    loadData();
 
     return () => {
-      if (typeof stopListening === "function") stopListening();
+      if (listenerRef.current) listenerRef.current();
     };
   }, []);
 
@@ -38,7 +57,7 @@ export default function Dashboard() {
     script.textContent = `
       import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
       createChat({
-        webhookUrl: 'https://chatenf.app.n8n.cloud/webhook/8fee68ab-336a-4679-99d3-379cf1395630/chat',
+        webhookUrl: 'https://enfm.app.n8n.cloud/webhook/3aa0f286-db4e-4502-88f1-ec9f638f71fd/chat',
         target: '#n8n-chat',
         mode: 'window',
         defaultLanguage: 'es',
@@ -71,25 +90,25 @@ export default function Dashboard() {
         <label>IP:</label>
         <input type="text" placeholder="192.168.43.114" />
         <button>Conectar</button>
+
+        {/* 🔹 BOTÓN ACTUALIZAR */}
+        <button className="btn-update" onClick={loadData}>🔄 Actualizar</button>
       </div>
 
       {data ? (
         <>
           <div className="cards-container">
 
-            {/* 🔹 Conductividad */}
             <div className="card temp">
               <h2>{data.conductivity ?? "--"} µS/cm</h2>
               <p>CONDUCTIVIDAD ELÉCTRICA</p>
             </div>
 
-            {/* 🔹 Temperatura */}
             <div className="card hum">
               <h2>{data.temperature ?? "--"} °C</h2>
               <p>TEMPERATURA</p>
             </div>
 
-            {/* 🔹 Luz */}
             <div className="card luz">
               <h2>{data.porcentajeLuz ?? "--"}%</h2>
               <p>LUZ</p>
@@ -102,6 +121,8 @@ export default function Dashboard() {
             <p><b>Light A0:</b> {data.lightA0 ?? "--"}</p>
             <p><b>Light Digital:</b> {data.lightDO ?? "--"}</p>
             <p><b>Timestamp:</b> {data.timestamp ?? "--"}</p>
+
+            <p><b>Última actualización:</b> {lastUpdate ?? "--"}</p>
           </div>
         </>
       ) : (
